@@ -4,11 +4,10 @@
 git config --global user.name "Ivan Havlytskyi"
 git config --global user.email "ivan.havlytskyi@gmail.com"
 
-# poetry
-curl -sSL https://install.python-poetry.org | python3 -
-export PATH="/root/.local/bin:$PATH"
-poetry config virtualenvs.in-project true
-poetry install
+# uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv sync
+source .venv/bin/activate
 
 # login
 huggingface-cli login --token $HUGGINGFACE_TOKEN
