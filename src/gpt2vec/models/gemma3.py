@@ -29,7 +29,7 @@ from transformers.utils import (
     logging,
 )
 
-from src.losses.losses import ForMaskedLMLoss, ForMaskedNTPLoss
+from gpt2vec.losses.losses import ForMaskedLMLoss, ForMaskedNTPLoss
 
 
 logger = logging.get_logger(__name__)

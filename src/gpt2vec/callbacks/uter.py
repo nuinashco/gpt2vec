@@ -1,7 +1,7 @@
 import torch
 from transformers import TrainerCallback, TrainingArguments, TrainerState, TrainerControl
 from typing import Dict, Any
-from src.metrics.uter import UTERScore
+from gpt2vec.metrics.uter import UTERScore
 
 
 class UTERCallback(TrainerCallback):

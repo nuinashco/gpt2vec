@@ -2,7 +2,7 @@ import os
 import hydra
 from omegaconf import DictConfig, OmegaConf
 import wandb
-from src.utils.other import set_seeds
+from gpt2vec.utils.other import set_seeds
 
 import torch
 from transformers import (
@@ -14,9 +14,9 @@ from transformers import (
 )
 from peft import get_peft_model, LoraConfig, TaskType
 from datasets import load_dataset
-from src.models import MODELS_MAPPING
-from src.callbacks.partial_grad_norm import PartialGradNormCallback
-from src.callbacks.directionality import AttentionGeometryCallback
+from gpt2vec.models import MODELS_MAPPING
+from gpt2vec.callbacks.partial_grad_norm import PartialGradNormCallback
+from gpt2vec.callbacks.directionality import AttentionGeometryCallback
 
 @hydra.main(version_base=None, config_path="../config", config_name="config")
 def main(cfg: DictConfig):

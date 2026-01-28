@@ -1,7 +1,7 @@
 import numpy as np 
 import torch
 import sys
-from src.metrics.attention_geometry.utils import get_M_checkpoints, get_M_shard, get_M_fullmodel
+from gpt2vec.metrics.attention_geometry.utils import get_M_checkpoints, get_M_shard, get_M_fullmodel
 
 def get_scores(models: dict,
                model_name: str, model, config, path: list,

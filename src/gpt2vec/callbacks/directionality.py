@@ -4,7 +4,7 @@ from typing import Dict, Any, Iterable
 
 from transformers import TrainerCallback
 from transformers.integrations import WandbCallback
-from src.metrics.directionality import (
+from gpt2vec.metrics.directionality import (
     AttentionExtractor,
     SymmetryScore,
     DirectionalityScore,
