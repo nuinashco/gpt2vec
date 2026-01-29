@@ -161,7 +161,8 @@ class biLlamaForCausalLM(biLlamaPreTrainedModel, GenerationMixin):
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
         )
-    
+
+
 
 class biLlamaForMaskedNTP(biLlamaForCausalLM): ...
 
