@@ -152,7 +152,7 @@ class biLlamaForCausalLM(biLlamaPreTrainedModel, GenerationMixin):
 
         loss = None
         if labels is not None:
-            loss = self.loss_function(logits=logits, labels=labels, vocab_size=self.config.vocab_size, **kwargs)
+            loss = ForCausalLMLoss(logits=logits, labels=labels, vocab_size=self.config.vocab_size, **kwargs)
 
         return CausalLMOutputWithPast(
             loss=loss,
@@ -161,6 +161,10 @@ class biLlamaForCausalLM(biLlamaPreTrainedModel, GenerationMixin):
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
         )
+    
+
+class biLlamaForMaskedNTP(biLlamaForCausalLM): ...
+
 
 
 class biLlamaForTokenClassification(biLlamaPreTrainedModel):
@@ -221,5 +225,8 @@ class biLlamaForTokenClassification(biLlamaPreTrainedModel):
     
 
 __all__ = [
-    "biLlamaModel", "biLlamaForCausalLM", "biLlamaForTokenClassification"
+    "biLlamaModel",
+    "biLlamaForCausalLM",
+    "biLlamaForMaskedNTP",
+    "biLlamaForTokenClassification", 
 ]
