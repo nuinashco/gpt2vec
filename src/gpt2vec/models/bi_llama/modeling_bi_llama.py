@@ -14,7 +14,7 @@ from transformers.models.llama.modeling_llama import (
 )
 from transformers.loss.loss_utils import ForCausalLMLoss
 
-from gpt2vec.models.bi_llama.configuration_bi_llama import biLlamaConfig
+from .configuration_bi_llama import biLlamaConfig
 
 
 
