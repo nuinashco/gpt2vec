@@ -7,11 +7,12 @@ from transformers.generation import GenerationMixin
 from transformers.processing_utils import Unpack
 from transformers.utils import TransformersKwargs
 from transformers.masking_utils import create_causal_mask
-from transformers.modeling_outputs import BaseModelOutputWithPast, CausalLMOutputWithPast
+from transformers.modeling_outputs import BaseModelOutputWithPast, CausalLMOutputWithPast, TokenClassifierOutput
 from transformers.models.llama.modeling_llama import (
     LlamaDecoderLayer, LlamaRMSNorm, LlamaRotaryEmbedding,
-    LlamaPreTrainedModel,
+    LlamaPreTrainedModel
 )
+from transformers.loss.loss_utils import ForCausalLMLoss
 
 from gpt2vec.models.bi_llama.configuration_bi_llama import biLlamaConfig
 
@@ -160,8 +161,65 @@ class biLlamaForCausalLM(biLlamaPreTrainedModel, GenerationMixin):
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
         )
+
+
+class biLlamaForTokenClassification(biLlamaPreTrainedModel):
+    base_model_prefix = "model"
+
+    def __init__(self, config):
+        super().__init__(config)
+        self.num_labels = config.num_labels
+        # Similar to `self.model = AutoModel.from_config(config)` but allows to change the base model name if needed in the child class
+        setattr(self, self.base_model_prefix, biLlamaModel._from_config(config))
+        if getattr(config, "classifier_dropout", None) is not None:
+            classifier_dropout = config.classifier_dropout
+        elif getattr(config, "hidden_dropout", None) is not None:
+            classifier_dropout = config.hidden_dropout
+        else:
+            classifier_dropout = 0.1
+        self.dropout = nn.Dropout(classifier_dropout)
+        self.lm_head = nn.Linear(config.hidden_size, config.num_labels, bias=False)
+
+        # Initialize weights and apply final processing
+        self.post_init()
+
+
+    def forward(
+        self,
+        input_ids: torch.LongTensor | None = None,
+        attention_mask: torch.Tensor | None = None,
+        position_ids: torch.LongTensor | None = None,
+        past_key_values: Cache | None = None,
+        inputs_embeds: torch.FloatTensor | None = None,
+        labels: torch.LongTensor | None = None,
+        use_cache: bool | None = None,
+        **kwargs: Unpack[TransformersKwargs],
+    ) -> TokenClassifierOutput:
+        outputs: BaseModelOutputWithPast = getattr(self, self.base_model_prefix)(
+            input_ids,
+            attention_mask=attention_mask,
+            position_ids=position_ids,
+            past_key_values=past_key_values,
+            inputs_embeds=inputs_embeds,
+            use_cache=use_cache,
+            **kwargs,
+        )
+        sequence_output = outputs.last_hidden_state
+        sequence_output = self.dropout(sequence_output)
+        logits = self.lm_head(sequence_output)
+
+        loss = None
+        if labels is not None:
+            loss = ForCausalLMLoss(logits, labels, self.config)
+
+        return TokenClassifierOutput(
+            loss=loss,
+            logits=logits,
+            hidden_states=outputs.hidden_states,
+            attentions=outputs.attentions,
+        )
     
 
 __all__ = [
-    "biLlamaModel", "biLlamaForCausalLM"
+    "biLlamaModel", "biLlamaForCausalLM", "biLlamaForTokenClassification"
 ]
